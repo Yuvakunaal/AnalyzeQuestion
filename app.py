@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from services.problem_analyzer import analyze_problem
 
-app = FastAPI(title="ChatWithQuestion Backend")
+app = FastAPI(title="AnalyzeQuestion Backend")
 
 templates = Jinja2Templates(directory="templates")
 

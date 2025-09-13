@@ -221,6 +221,7 @@
         border-radius: 8px;
         padding: 15px;
         background: var(--card-bg);
+        position: relative;
       }
 
       .pattern-list {
@@ -325,6 +326,56 @@
         font-size: 0.9rem;
         padding: 20px;
         border-top: 1px solid var(--border);
+      }
+
+      /* Copy Button Styles */
+      .copy-container {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+      }
+
+      .copy-btn {
+        background: var(--bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+      }
+
+      .copy-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      .copy-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--success);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.3s, transform 0.3s;
+      }
+
+      .copy-notification.show {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       /* Enhanced Modal Styles */
@@ -643,7 +694,7 @@
         </div>
         <div class="nav-buttons">
           <button class="theme-toggle" id="themeToggle">
-            <i class="fas fa-moon"></i>
+            <i class="fas fa-moon" style="color: black"></i>
           </button>
           <a href="#" class="nav-button" id="aboutButton">
             <i class="fas fa-info"></i>
@@ -674,6 +725,15 @@
               Results will appear here after analysis...
             </p>
             <div id="results" style="display: none">
+              <div
+                class="copy-container"
+                id="copyContainer"
+                style="display: none"
+              >
+                <button class="copy-btn" id="copyBtn">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
               <h3><i class="fas fa-shapes"></i> Patterns:</h3>
               <div class="pattern-list" id="patternList"></div>
 
@@ -692,6 +752,12 @@
           Powered by FastAPI - Ollama - SQLite | AnalyzeQuestion - by Kunaal
         </p>
       </footer>
+    </div>
+
+    <!-- Copy Notification -->
+    <div class="copy-notification" id="copyNotification">
+      <i class="fas fa-check-circle"></i>
+      <span>Results copied to clipboard!</span>
     </div>
 
     <!-- Enhanced About Modal -->
@@ -855,7 +921,18 @@
             Results are presented in an intuitive, easy-to-understand format
           </li>
         </ol>
-
+        <br />
+        <div>
+          <p>
+            ⚠ Note : Please make sure to enter the input properly. Sometimes,
+            even if the input is wrong or incomplete, the system might still
+            give a solution because of how AI and the Retrieval-Augmented
+            Generation (RAG) model works. It may use context from previous
+            interactions or similar problems to guess what you meant, which can
+            lead to unexpected or inaccurate results. So, always double-check
+            the input and the solution before using it!
+          </p>
+        </div>
         <div class="modal-footer">
           <p>
             AnalyzeQuestion - Revolutionizing how developers approach coding
@@ -882,6 +959,9 @@
         const aboutButton = document.getElementById("aboutButton");
         const aboutModal = document.getElementById("aboutModal");
         const closeModal = document.getElementById("closeModal");
+        const copyBtn = document.getElementById("copyBtn");
+        const copyContainer = document.getElementById("copyContainer");
+        const copyNotification = document.getElementById("copyNotification");
 
         // Theme Management
         const savedTheme = localStorage.getItem("theme") || "light";
@@ -900,8 +980,8 @@
         function updateThemeIcon(theme) {
           themeToggle.innerHTML =
             theme === "light"
-              ? '<i class="fas fa-moon"></i>'
-              : '<i class="fas fa-sun"></i>';
+              ? '<i class="fas fa-moon" style="color: black;"></i>'
+              : '<i class="fas fa-sun" style="color: gold;"></i>';
         }
 
         // Modal Management
@@ -923,6 +1003,48 @@
           }
         });
 
+        // Copy functionality
+        copyBtn.addEventListener("click", function () {
+          // Format the results for copying
+          const patterns = Array.from(patternList.querySelectorAll(".pattern"))
+            .map((el) => el.textContent)
+            .join(", ");
+
+          const difficulty = difficultyElem.textContent;
+
+          const approachSteps = Array.from(approachList.querySelectorAll("li"))
+            .map((el, index) => `${index + 1}. ${el.textContent}`)
+            .join("\n");
+
+          // Create a nicely formatted text version
+          const textToCopy = `ANALYSIS RESULTS:
+
+Patterns: ${patterns}
+
+Difficulty: ${difficulty}
+
+Approach:
+${approachSteps}
+
+---
+Generated by AnalyzeQuestion - AI-Powered Coding Problem Analysis`;
+
+          // Copy to clipboard
+          navigator.clipboard
+            .writeText(textToCopy)
+            .then(() => {
+              // Show notification
+              copyNotification.classList.add("show");
+              setTimeout(() => {
+                copyNotification.classList.remove("show");
+              }, 2000);
+            })
+            .catch((err) => {
+              console.error("Failed to copy: ", err);
+              alert("Failed to copy results to clipboard.");
+            });
+        });
+
         // Problem Analysis
         analyzeBtn.addEventListener("click", async function () {
           const problemText = problemInput.value.trim();
@@ -936,6 +1058,7 @@
           loader.style.display = "block";
           placeholderText.style.display = "none";
           resultsDiv.style.display = "none";
+          copyContainer.style.display = "none";
 
           try {
             const response = await fetch("/analyze", {
@@ -1017,9 +1140,10 @@
             approachList.innerHTML = "<li>No approach steps provided.</li>";
           }
 
-          // Show results, hide placeholder
+          // Show results, hide placeholder, show copy button
           placeholderText.style.display = "none";
           resultsDiv.style.display = "block";
+          copyContainer.style.display = "block";
         }
       });
     </script>
