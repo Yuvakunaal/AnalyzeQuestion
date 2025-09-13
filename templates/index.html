@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AnalyzeQuestion - Problem Analyzer</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #6e8efb;
+        --secondary: #a777e3;
+        --text: #2d3748;
+        --text-light: #718096;
+        --bg: #f5f7fa;
+        --card-bg: #ffffff;
+        --border: #e2e8f0;
+        --shadow: rgba(0, 0, 0, 0.05);
+        --success: #48bb78;
+        --warning: #ecc94b;
+        --danger: #f56565;
+        --pattern-bg: #e6f7ff;
+        --easy-bg: #e6f7e6;
+        --easy-text: #2e7d32;
+        --medium-bg: #fff3e0;
+        --medium-text: #ef6c00;
+        --hard-bg: #ffebee;
+        --hard-text: #c62828;
+      }
+
+      [data-theme="dark"] {
+        --primary: #8ba4ff;
+        --secondary: #c19ff5;
+        --text: #e2e8f0;
+        --text-light: #a0aec0;
+        --bg: #1a202c;
+        --card-bg: #2d3748;
+        --border: #4a5568;
+        --shadow: rgba(0, 0, 0, 0.2);
+        --pattern-bg: #2c5282;
+        --easy-bg: #22543d;
+        --easy-text: #68d391;
+        --medium-bg: #744210;
+        --medium-text: #f6ad55;
+        --hard-bg: #742a2a;
+        --hard-text: #fc8181;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .header-content {
+        flex: 1;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .theme-toggle {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 1.2rem;
+        transition: all 0.3s;
+      }
+
+      .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(30deg);
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 12px;
+        margin-left: 20px;
+      }
+
+      .nav-button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 1.2rem;
+        transition: all 0.3s;
+        text-decoration: none;
+      }
+
+      .nav-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .main-content {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .input-section,
+      .output-section {
+        flex: 1;
+        background: var(--card-bg);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px var(--shadow);
+        border: 1px solid var(--border);
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        color: var(--text);
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      h2 i {
+        color: var(--primary);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 15px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 16px;
+        resize: vertical;
+        margin-bottom: 15px;
+        background: var(--card-bg);
+        color: var(--text);
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.2);
+      }
+
+      button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+      }
+
+      button:hover {
+        background: #5a7df9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-box {
+        min-height: 200px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 15px;
+        background: var(--card-bg);
+      }
+
+      .pattern-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .pattern {
+        background: var(--pattern-bg);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .difficulty {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 15px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+      }
+
+      .easy {
+        background: var(--easy-bg);
+        color: var(--easy-text);
+      }
+
+      .medium {
+        background: var(--medium-bg);
+        color: var(--medium-text);
+      }
+
+      .hard {
+        background: var(--hard-bg);
+        color: var(--hard-text);
+      }
+
+      .approach-list {
+        list-style: none;
+      }
+
+      .approach-list li {
+        margin-bottom: 12px;
+        padding: 12px;
+        background: var(--bg);
+        border-radius: 8px;
+        border-left: 4px solid var(--primary);
+        display: flex;
+        gap: 10px;
+      }
+
+      .approach-list li::before {
+        content: counter(step);
+        counter-increment: step;
+        background: var(--primary);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .loader {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .loader-spinner {
+        border: 4px solid var(--border);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 40px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        padding: 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      /* Enhanced Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-content {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 900px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        border: 1px solid var(--border);
+        animation: modalFadeIn 0.3s ease-out;
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--bg);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px var(--shadow);
+      }
+
+      .close-modal:hover {
+        color: var(--danger);
+        transform: rotate(90deg);
+        background: var(--danger-light);
+      }
+
+      .modal-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--primary);
+      }
+
+      .modal-header h2 {
+        font-size: 2.2rem;
+        color: var(--primary);
+        border-bottom: none;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+
+      .modal-header p {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 30px 0;
+      }
+
+      .feature-card {
+        background: linear-gradient(135deg, var(--bg), var(--card-bg));
+        padding: 25px 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 15px var(--shadow);
+        border: 1px solid var(--border);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px var(--shadow);
+      }
+
+      .feature-card i {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .feature-card h4 {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+        color: var(--text);
+      }
+
+      .feature-card p {
+        color: var(--text-light);
+        font-size: 0.95rem;
+      }
+
+      .tech-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 20px 0;
+        justify-content: center;
+      }
+
+      .tech-item {
+        background: var(--bg);
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+      }
+
+      .tech-item i {
+        color: var(--primary);
+      }
+
+      .rag-diagram {
+        width: 100%;
+        max-width: 700px;
+        margin: 30px auto;
+        padding: 20px;
+        background: var(--bg);
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .rag-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 40px 0;
+      }
+
+      .rag-steps::before {
+        content: "";
+        position: absolute;
+        top: 30px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary);
+        z-index: 1;
+      }
+
+      .rag-step {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        width: 120px;
+      }
+
+      .rag-step-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 15px;
+        box-shadow: 0 5px 15px rgba(110, 142, 251, 0.3);
+      }
+
+      .rag-step p {
+        font-size: 0.9rem;
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .architecture-section {
+        background: var(--bg);
+        padding: 25px;
+        border-radius: 12px;
+        margin: 30px 0;
+        border: 1px solid var(--border);
+      }
+
+      .architecture-section h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: var(--primary);
+      }
+
+      .benefits-list {
+        list-style: none;
+        margin: 20px 0;
+      }
+
+      .benefits-list li {
+        margin-bottom: 15px;
+        padding-left: 30px;
+        position: relative;
+      }
+
+      .benefits-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--success);
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .modal-footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 900px) {
+        .main-content {
+          flex-direction: column;
+        }
+
+        header {
+          flex-direction: column;
+          text-align: center;
+          gap: 20px;
+        }
+
+        .nav-buttons {
+          margin-left: 0;
+        }
+
+        .rag-steps {
+          flex-direction: column;
+          align-items: center;
+          gap: 40px;
+        }
+
+        .rag-steps::before {
+          width: 2px;
+          height: 80%;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+      }
+
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        .input-section,
+        .output-section {
+          padding: 20px;
+        }
+
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+          padding: 25px 20px;
+        }
+
+        .modal-header h2 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-content">
+          <h1>AnalyzeQuestion</h1>
+          <p class="subtitle">AI-Powered Coding Problem Analysis</p>
+        </div>
+        <div class="nav-buttons">
+          <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+          </button>
+          <a href="#" class="nav-button" id="aboutButton">
+            <i class="fas fa-info"></i>
+          </a>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="input-section">
+          <h2><i class="fas fa-code"></i> Enter Problem Statement</h2>
+          <textarea
+            id="problemInput"
+            placeholder="Paste your coding problem here..."
+          ></textarea>
+          <button id="analyzeBtn">
+            <i class="fas fa-brain"></i> Analyze Problem
+          </button>
+          <div class="loader" id="loader">
+            <div class="loader-spinner"></div>
+            <p>Analyzing your problem...</p>
+          </div>
+        </div>
+
+        <div class="output-section">
+          <h2><i class="fas fa-chart-bar"></i> Analysis Results</h2>
+          <div class="result-box" id="resultBox">
+            <p id="placeholderText">
+              Results will appear here after analysis...
+            </p>
+            <div id="results" style="display: none">
+              <h3><i class="fas fa-shapes"></i> Patterns:</h3>
+              <div class="pattern-list" id="patternList"></div>
+
+              <h3><i class="fas fa-signal"></i> Difficulty:</h3>
+              <div class="difficulty" id="difficulty"></div>
+
+              <h3><i class="fas fa-map-signs"></i> Approach:</h3>
+              <ol class="approach-list" id="approachList"></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          Powered by FastAPI - Ollama - SQLite | AnalyzeQuestion - by Kunaal
+        </p>
+      </footer>
+    </div>
+
+    <!-- Enhanced About Modal -->
+    <div class="modal" id="aboutModal">
+      <div class="modal-content">
+        <button class="close-modal" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-header">
+          <h2><i class="fas fa-rocket"></i> About AnalyzeQuestion</h2>
+          <p>
+            Advanced AI-Powered Coding Problem Analysis with Retrieval-Augmented
+            Generation Technology
+          </p>
+        </div>
+
+        <p>
+          AnalyzeQuestion is an innovative AI-powered platform designed to help
+          developers, students, and competitive programmers efficiently analyze
+          and solve complex coding challenges. Our system leverages cutting-edge
+          Retrieval-Augmented Generation (RAG) technology to provide
+          context-aware, accurate problem analysis and solution approaches.
+        </p>
+
+        <div class="architecture-section">
+          <h3><i class="fas fa-sitemap"></i> RAG Architecture</h3>
+          <div class="rag-diagram">
+            <div class="rag-steps">
+              <div class="rag-step">
+                <div class="rag-step-icon">
+                  <i class="fas fa-database"></i>
+                </div>
+                <p>Knowledge Retrieval</p>
+              </div>
+              <div class="rag-step">
+                <div class="rag-step-icon">
+                  <i class="fas fa-cogs"></i>
+                </div>
+                <p>Context Augmentation</p>
+              </div>
+              <div class="rag-step">
+                <div class="rag-step-icon">
+                  <i class="fas fa-brain"></i>
+                </div>
+                <p>AI Generation</p>
+              </div>
+              <div class="rag-step">
+                <div class="rag-step-icon">
+                  <i class="fas fa-chart-bar"></i>
+                </div>
+                <p>Result Synthesis</p>
+              </div>
+            </div>
+            <p>
+              Our RAG pipeline combines retrieved knowledge from our coding
+              problem database with advanced AI generation for superior analysis
+              accuracy.
+            </p>
+          </div>
+        </div>
+
+        <h3><i class="fas fa-star"></i> Key Advantages</h3>
+        <ul class="benefits-list">
+          <li>Context-aware analysis using Retrieval-Augmented Generation</li>
+          <li>
+            Identifies algorithmic patterns and data structures efficiently
+          </li>
+          <li>
+            Provides step-by-step solution approaches tailored to each problem
+          </li>
+          <li>
+            Accurately assesses problem difficulty based on historical data
+          </li>
+          <li>
+            Continuously improves through machine learning from new problems
+          </li>
+          <li>
+            Enterprise-ready architecture with scalable backend processing
+          </li>
+        </ul>
+
+        <h3><i class="fas fa-cogs"></i> Advanced Features</h3>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <i class="fas fa-robot"></i>
+            <h4>RAG-Powered AI</h4>
+            <p>
+              Uses retrieval-augmented generation for context-aware analysis and
+              accurate pattern recognition
+            </p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-bolt"></i>
+            <h4>Real-Time Processing</h4>
+            <p>
+              Fast analysis with Ollama's optimized model inference and
+              efficient backend processing
+            </p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-database"></i>
+            <h4>Knowledge Base</h4>
+            <p>
+              Leverages an extensive database of coding problems and solutions
+              for accurate pattern matching
+            </p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-chart-line"></i>
+            <h4>Adaptive Learning</h4>
+            <p>
+              Continuously improves analysis accuracy through machine learning
+              from newly processed problems
+            </p>
+          </div>
+        </div>
+
+        <h3><i class="fas fa-code-branch"></i> Technology Stack</h3>
+        <div class="tech-stack">
+          <div class="tech-item">
+            <i class="fas fa-server"></i>
+            <span>FastAPI Backend</span>
+          </div>
+          <div class="tech-item">
+            <i class="fas fa-brain"></i>
+            <span>Ollama AI Processing</span>
+          </div>
+          <div class="tech-item">
+            <i class="fas fa-database"></i>
+            <span>SQLite Database</span>
+          </div>
+          <div class="tech-item">
+            <i class="fab fa-python"></i>
+            <span>Python Algorithms</span>
+          </div>
+          <div class="tech-item">
+            <i class="fas fa-code"></i>
+            <span>RESTful API</span>
+          </div>
+        </div>
+
+        <h3><i class="fas fa-lightbulb"></i> How It Works</h3>
+        <ol class="approach-list">
+          <li>Input your coding problem or algorithm challenge</li>
+          <li>
+            Our RAG system retrieves relevant context from our knowledge base
+          </li>
+          <li>
+            AI analyzes the problem using augmented context and pattern
+            recognition
+          </li>
+          <li>
+            System identifies key algorithmic patterns and data structures
+          </li>
+          <li>Difficulty is assessed based on historical problem data</li>
+          <li>
+            Step-by-step solution approach is generated with optimal efficiency
+          </li>
+          <li>
+            Results are presented in an intuitive, easy-to-understand format
+          </li>
+        </ol>
+
+        <div class="modal-footer">
+          <p>
+            AnalyzeQuestion - Revolutionizing how developers approach coding
+            challenges
+          </p>
+          <p>© 2025 AnalyzeQuestion | Enterprise-Ready AI Solution</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // DOM Elements
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const problemInput = document.getElementById("problemInput");
+        const loader = document.getElementById("loader");
+        const resultBox = document.getElementById("resultBox");
+        const placeholderText = document.getElementById("placeholderText");
+        const resultsDiv = document.getElementById("results");
+        const patternList = document.getElementById("patternList");
+        const difficultyElem = document.getElementById("difficulty");
+        const approachList = document.getElementById("approachList");
+        const themeToggle = document.getElementById("themeToggle");
+        const aboutButton = document.getElementById("aboutButton");
+        const aboutModal = document.getElementById("aboutModal");
+        const closeModal = document.getElementById("closeModal");
+
+        // Theme Management
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener("click", function () {
+          const currentTheme =
+            document.documentElement.getAttribute("data-theme");
+          const newTheme = currentTheme === "light" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", newTheme);
+          localStorage.setItem("theme", newTheme);
+          updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+          themeToggle.innerHTML =
+            theme === "light"
+              ? '<i class="fas fa-moon"></i>'
+              : '<i class="fas fa-sun"></i>';
+        }
+
+        // Modal Management
+        aboutButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          aboutModal.style.display = "flex";
+          document.body.style.overflow = "hidden";
+        });
+
+        closeModal.addEventListener("click", function () {
+          aboutModal.style.display = "none";
+          document.body.style.overflow = "auto";
+        });
+
+        window.addEventListener("click", function (e) {
+          if (e.target === aboutModal) {
+            aboutModal.style.display = "none";
+            document.body.style.overflow = "auto";
+          }
+        });
+
+        // Problem Analysis
+        analyzeBtn.addEventListener("click", async function () {
+          const problemText = problemInput.value.trim();
+
+          if (!problemText) {
+            alert("Please enter a problem statement to analyze.");
+            return;
+          }
+
+          // Show loader, hide previous results
+          loader.style.display = "block";
+          placeholderText.style.display = "none";
+          resultsDiv.style.display = "none";
+
+          try {
+            const response = await fetch("/analyze", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: problemText,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(
+                `Server returned ${response.status}: ${response.statusText}`
+              );
+            }
+
+            const data = await response.json();
+
+            // Display the results
+            displayResults(data);
+          } catch (error) {
+            console.error("Error:", error);
+            resultBox.innerHTML = `<p style="color: var(--danger);">Error analyzing problem: ${error.message}. Please make sure the backend server is running.</p>`;
+          } finally {
+            loader.style.display = "none";
+          }
+        });
+
+        function displayResults(data) {
+          // Clear previous results
+          patternList.innerHTML = "";
+          approachList.innerHTML = "";
+
+          // Display patterns
+          if (data.patterns && data.patterns.length > 0) {
+            data.patterns.forEach((pattern) => {
+              const patternElem = document.createElement("span");
+              patternElem.classList.add("pattern");
+              patternElem.textContent = pattern;
+              patternList.appendChild(patternElem);
+            });
+          } else {
+            patternList.innerHTML = "<p>No patterns identified.</p>";
+          }
+
+          // Display difficulty
+          if (data.difficulty) {
+            difficultyElem.textContent = data.difficulty;
+            difficultyElem.classList.remove("easy", "medium", "hard");
+
+            let iconClass = "fas fa-question-circle";
+            if (data.difficulty.toLowerCase().includes("easy")) {
+              difficultyElem.classList.add("easy");
+              iconClass = "fas fa-smile";
+            } else if (data.difficulty.toLowerCase().includes("medium")) {
+              difficultyElem.classList.add("medium");
+              iconClass = "fas fa-meh";
+            } else if (data.difficulty.toLowerCase().includes("hard")) {
+              difficultyElem.classList.add("hard");
+              iconClass = "fas fa-frown";
+            }
+
+            difficultyElem.innerHTML = `<i class="${iconClass}"></i> ${data.difficulty}`;
+          } else {
+            difficultyElem.textContent = "Unknown";
+          }
+
+          // Display approach
+          if (data.approach && data.approach.length > 0) {
+            approachList.style.counterReset = "step";
+            data.approach.forEach((step) => {
+              const listItem = document.createElement("li");
+              listItem.textContent = step;
+              approachList.appendChild(listItem);
+            });
+          } else {
+            approachList.innerHTML = "<li>No approach steps provided.</li>";
+          }
+
+          // Show results, hide placeholder
+          placeholderText.style.display = "none";
+          resultsDiv.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>
