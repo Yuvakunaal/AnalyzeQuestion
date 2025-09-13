@@ -110,4 +110,4 @@ Kunaal - GenAI, AI, Python Enthusiast
 - The open-source community for various libraries and tools
 
 
-⭐ If you like this project, please support by starring the repository!
+> ⭐ If you like this project, please support by starring the repository!
