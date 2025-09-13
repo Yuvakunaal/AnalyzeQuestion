@@ -25,7 +25,15 @@ AnalyzeQuestion is an advanced AI-powered platform designed to help developers, 
 
 Follow these steps to set up and run AnalyzeQuestion:
 
-1. **Download Ollama**
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/Yuvakunaal/AnalyzeQuestion.git
+   cd AnalyzeQuestion (or) open vscode -> open this folder
+   ```
+
+2. **Download Ollama**
+
    - Visit the [Ollama website](https://ollama.ai) and download the application.
    - Open your terminal and run:
      ```bash
@@ -33,7 +41,7 @@ Follow these steps to set up and run AnalyzeQuestion:
      ```
    - The Ollama model is now downloaded on your system.
 
-2. **Create a Virtual Environment (venv)**
+3. **Create a Virtual Environment (venv)**
 
    - **For Windows:**
      ```bash
@@ -46,20 +54,20 @@ Follow these steps to set up and run AnalyzeQuestion:
      source venv/bin/activate
      ```
 
-3. **Install Dependencies**
+4. **Install Dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Run the Application**
+5. **Run the Application**
+
    ```bash
    uvicorn app:app --reload
    ```
 
-5. **Open Browser** : Navigate to http://127.0.0.1:8000/
-6. Start using AnalyzeQuestion to analyze your coding problems!
-
-
+6. **Open Browser** : Navigate to http://127.0.0.1:8000/
+7. Start using AnalyzeQuestion to analyze your coding problems!
 
 ## 🎯 How It Works
 
@@ -73,7 +81,6 @@ Follow these steps to set up and run AnalyzeQuestion:
 
 Input a coding problem like:
 "Given an array of integers, find the maximum sum of a contiguous subarray."
-
 
 Get analysis results:
 
@@ -95,8 +102,6 @@ Get analysis results:
 ## 👨‍💻 Developer
 
 Kunaal - GenAI, AI, Python Enthusiast
-
-
 
 ## 🙏 Acknowledgments
 
