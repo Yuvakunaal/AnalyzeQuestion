@@ -29,7 +29,7 @@ Follow these steps to set up and run AnalyzeQuestion:
 
    ```bash
    git clone https://github.com/Yuvakunaal/AnalyzeQuestion.git
-   cd AnalyzeQuestion (or) open vscode -> open this folder
+   cd AnalyzeQuestion (or) open vscode - open this folder
    ```
 
 2. **Download Ollama**
